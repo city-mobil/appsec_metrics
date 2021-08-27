@@ -1,0 +1,26 @@
+stages:
+  - build
+  - run
+
+build:
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - set -x
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH
+  stage: build
+  tags:
+    - docker
+
+run:
+  stage: run
+  image:
+    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH
+  script:
+    - python3 appsec_metrics.py
+  tags:
+    - docker
+#

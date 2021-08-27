@@ -1,0 +1,4 @@
+PyGithub==1.54.1
+pytz
+requests
+pymongo
